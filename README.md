@@ -1,17 +1,23 @@
 # SEO Bot
 
-Public site: https://github.com/Chaostheone/seo-bot
+Standalone site auditor. Python standard library only — nothing to pip install.
 
-Local auditor with a browser UI. The page at `/` is the website: what the bot checks, then the audit form.
+Repository: https://github.com/Chaostheone/seo-bot
 
 ## Run
 
 ```bash
-cd /home/user/Work/seo-bot
+git clone https://github.com/Chaostheone/seo-bot.git
+cd seo-bot
+python3 test_auditor.py
 python3 server.py
 ```
 
 Open http://127.0.0.1:8765. Paste a public URL, choose how many pages to crawl (1–30), and start the audit.
+
+GitHub Actions runs `test_auditor.py` on every push. Those tests use saved HTML and do not crawl the network.
+
+The page at `/` is the website: what the bot checks, then the audit form.
 
 The report scores each HTML page on title, meta description, H1, language, viewport, canonical, word count, image alt text, Open Graph tags, and internal links. It also checks `robots.txt` and a sitemap.
 
