@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SEO Bot</title>
+  <style>
+    :root {
+      --ink: #1c1915;
+      --paper: #f4efe6;
+      --card: #fffdf8;
+      --line: #e2d8c8;
+      --muted: #6d6458;
+      --accent: #0f6e56;
+      --accent-2: #c4552a;
+      --high: #9c2f2f;
+      --med: #a15c12;
+      --low: #3d6b8a;
+      --good: #0f6e56;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background:
+        radial-gradient(1200px 500px at 10% -10%, #efe4cf, transparent 60%),
+        var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    header {
+      padding: 28px 6vw 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+    }
+    h1 {
+      font-family: Georgia, "Iowan Old Style", serif;
+      font-weight: 500;
+      font-size: 2.4rem;
+      margin: 0;
+      letter-spacing: -0.03em;
+    }
+    header p { margin: 6px 0 0; color: var(--muted); max-width: 46rem; }
+    main { padding: 16px 6vw 64px; }
+    form {
+      display: grid;
+      grid-template-columns: 1fr 120px auto auto;
+      gap: 10px;
+      align-items: end;
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 14px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(60, 40, 10, 0.05);
+    }
+    label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; }
+    input[type="url"], input[type="number"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: inherit;
+      color: inherit;
+    }
+    .check { display: flex; align-items: end; gap: 8px; font-size: 0.9rem; padding-bottom: 8px; }
+    button {
+      border: 0;
+      background: var(--ink);
+      color: #f7f1e6;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font: inherit;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.5; cursor: wait; }
+    button.ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+    #status { min-height: 1.4rem; margin: 12px 2px; color: var(--muted); }
+    .summary {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 18px;
+      margin: 8px 0 20px;
+    }
+    .score {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(var(--accent) calc(var(--p) * 1%), #e7e0d4 0);
+    }
+    .score span {
+      width: 108px;
+      height: 108px;
+      border-radius: 50%;
+      background: var(--card);
+      display: grid;
+      place-items: center;
+      font-family: Georgia, serif;
+      font-size: 2.2rem;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; align-content: start; }
+    .chip {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+    }
+    .site-issue, .page {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .page-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+    }
+    .page h2 {
+      font-size: 1rem;
+      margin: 0 0 4px;
+      font-weight: 600;
+      word-break: break-all;
+    }
+    a { color: var(--accent); }
+    .meta { color: var(--muted); font-size: 0.85rem; margin: 0; }
+    .badge {
+      font-size: 0.8rem;
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: #efe8dc;
+      white-space: nowrap;
+    }
+    ul.issues { list-style: none; padding: 0; margin: 10px 0 0; }
+    ul.issues li {
+      padding: 8px 0;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 8px;
+    }
+    .sev { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .sev.high { color: var(--high); }
+    .sev.medium { color: var(--med); }
+    .sev.low { color: var(--low); }
+    .fix { color: var(--muted); display: block; margin-top: 2px; }
+    .suggest {
+      margin-top: 10px;
+      background: #f6f3ec;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.92rem;
+    }
+    .suggest p { margin: 4px 0; }
+    .error { color: var(--high); }
+    @media (max-width: 800px) {
+      form { grid-template-columns: 1fr; }
+      .summary { grid-template-columns: 1fr; }
+      header { flex-direction: column; align-items: start; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>SEO Bot</h1>
+      <p>Crawl a public site, score titles, descriptions, headings, and technical basics, then draft replacement snippets.</p>
+    </div>
+  </header>
+  <main>
+    <form id="form">
+      <div>
+        <label for="url">Website</label>
+        <input id="url" type="url" name="url" placeholder="https://example.com" required>
+      </div>
+      <div>
+        <label for="max">Pages</label>
+        <input id="max" type="number" name="max_pages" min="1" max="30" value="8">
+      </div>
+      <div class="check">
+        <label><input id="sitemap" type="checkbox" checked> Use sitemap</label>
+      </div>
+      <button id="go" type="submit">Audit site</button>
+    </form>
+    <p id="status"></p>
+    <section id="out"></section>
+  </main>
+  <script>
+    const form = document.getElementById("form");
+    const statusEl = document.getElementById("status");
+    const out = document.getElementById("out");
+    const go = document.getElementById("go");
+
+    function esc(s) {
+      return String(s ?? "").replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      await runAudit();
+    });
+
+    const params = new URLSearchParams(location.search);
+    if (params.get("url")) {
+      document.getElementById("url").value = params.get("url");
+      if (params.get("max")) document.getElementById("max").value = params.get("max");
+      runAudit();
+    }
+
+    async function runAudit() {
+      out.innerHTML = "";
+      go.disabled = true;
+      statusEl.textContent = "Crawling…";
+      try {
+        const payload = {
+          url: document.getElementById("url").value,
+          max_pages: Number(document.getElementById("max").value),
+          use_sitemap: document.getElementById("sitemap").checked
+        };
+        const start = await fetch("/api/audit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const started = await start.json();
+        if (!start.ok) throw new Error(started.error || "Could not start");
+        const result = await poll(started.id);
+        render(result);
+        statusEl.textContent = `Crawled ${result.pages_crawled} page(s).`;
+      } catch (err) {
+        statusEl.innerHTML = `<span class="error">${esc(err.message)}</span>`;
+      } finally {
+        go.disabled = false;
+      }
+    }
+
+    async function poll(id) {
+      for (let i = 0; i < 120; i++) {
+        const res = await fetch("/api/audit/" + id);
+        const job = await res.json();
+        if (job.status === "done") return job;
+        if (job.status === "error") throw new Error(job.error || "Audit failed");
+        statusEl.textContent = "Crawling…";
+        await new Promise((r) => setTimeout(r, 800));
+      }
+      throw new Error("Timed out waiting for the crawl.");
+    }
+
+    function render(result) {
+      const site = (result.site_issues || []).map((item) => `
+        <div class="site-issue">
+          <strong class="sev ${esc(item.severity)}">${esc(item.severity)}</strong>
+          ${esc(item.message)}
+          <span class="fix">${esc(item.fix)}</span>
+        </div>`).join("");
+      const pages = result.pages.map((page, index) => `
+        <article class="page">
+          <div class="page-head">
+            <div>
+              <h2><a href="${esc(page.final_url || page.url)}" target="_blank" rel="noreferrer">${esc(page.title || page.url)}</a></h2>
+              <p class="meta">${esc(page.url)} · HTTP ${page.status} · ${page.words} words · ${page.internal_links} internal links</p>
+              <p class="meta">Title: ${esc(page.title || "—")} (${(page.title || "").length})</p>
+              <p class="meta">Description: ${esc(page.description || "—")} (${(page.description || "").length})</p>
+              <p class="meta">H1: ${esc((page.h1 || []).join(" | ") || "—")}</p>
+            </div>
+            <div class="badge">${page.score}/100</div>
+          </div>
+          <ul class="issues">
+            ${(page.issues || []).map((item) => `
+              <li>
+                <span class="sev ${esc(item.severity)}">${esc(item.severity)}</span>
+                <span>${esc(item.message)}<span class="fix">${esc(item.fix)}</span></span>
+              </li>`).join("") || "<li><span></span><span>No issues on the checks this bot runs.</span></li>"}
+          </ul>
+          <button class="ghost" type="button" data-suggest="${index}">Draft a better title and description</button>
+          <div class="suggest" id="sug-${index}" hidden></div>
+        </article>`).join("");
+      out.innerHTML = `
+        <div class="summary">
+          <div class="score" style="--p:${result.score}"><span>${result.score}</span></div>
+          <div>
+            <div class="chips">
+              <span class="chip">${result.pages_crawled} pages</span>
+              <span class="chip">robots.txt ${result.robots_txt ? "found" : "missing"}</span>
+              <span class="chip">sitemap ${result.sitemap ? "declared" : "not declared"}</span>
+            </div>
+            <div style="margin-top:12px">${site}</div>
+          </div>
+        </div>
+        ${pages}`;
+      out.querySelectorAll("[data-suggest]").forEach((btn) => {
+        btn.addEventListener("click", () => suggest(result.pages[Number(btn.dataset.suggest)], btn));
+      });
+    }
+
+    async function suggest(page, btn) {
+      const box = document.getElementById("sug-" + btn.dataset.suggest);
+      btn.disabled = true;
+      box.hidden = false;
+      box.textContent = "Writing…";
+      try {
+        const res = await fetch("/api/suggest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(page)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Rewrite failed");
+        box.innerHTML = `
+          <p><strong>Title</strong> (${data.title.length}) — ${esc(data.title)}</p>
+          <p><strong>Description</strong> (${data.description.length}) — ${esc(data.description)}</p>
+          <p><strong>H1</strong> — ${esc(data.h1)}</p>`;
+      } catch (err) {
+        box.innerHTML = `<span class="error">${esc(err.message)}</span>`;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
