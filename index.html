@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SEO Bot</title>
+  <title>SEO Bot — audit a site before you rewrite it</title>
+  <meta name="description" content="SEO Bot crawls a public website, scores titles, descriptions, headings, and technical basics, and lists the fixes.">
   <style>
     :root {
       --ink: #1c1915;
@@ -42,7 +43,24 @@
       margin: 0;
       letter-spacing: -0.03em;
     }
-    header p { margin: 6px 0 0; color: var(--muted); max-width: 46rem; }
+    header p { margin: 6px 0 0; color: var(--muted); max-width: 40rem; line-height: 1.45; }
+    nav { display: flex; gap: 16px; align-items: center; padding-bottom: 8px; }
+    nav a { color: var(--ink); text-decoration: none; font-size: 0.92rem; }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 0 0 22px;
+    }
+    .steps article {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+    .steps h2 { margin: 0 0 6px; font-size: 1rem; }
+    .steps p { margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.4; }
+    footer { color: var(--muted); font-size: 0.85rem; margin-top: 28px; }
     main { padding: 16px 6vw 64px; }
     form {
       display: grid;
@@ -167,6 +185,7 @@
     @media (max-width: 800px) {
       form { grid-template-columns: 1fr; }
       .summary { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; }
       header { flex-direction: column; align-items: start; }
     }
   </style>
@@ -175,11 +194,29 @@
   <header>
     <div>
       <h1>SEO Bot</h1>
-      <p>Crawl a public site, score titles, descriptions, headings, and technical basics, then draft replacement snippets.</p>
+      <p>A small auditor for public websites. It crawls the pages you choose, scores the signals search engines actually read, and writes the fixes in plain language.</p>
     </div>
+    <nav>
+      <a href="#audit">Run an audit</a>
+      <a href="https://github.com/Chaostheone/seo-bot">Source</a>
+    </nav>
   </header>
   <main>
-    <form id="form">
+    <section class="steps">
+      <article>
+        <h2>1. Crawl</h2>
+        <p>Give it a public URL. It follows the sitemap and same-site links, and it skips private networks.</p>
+      </article>
+      <article>
+        <h2>2. Score</h2>
+        <p>Each page is checked for title, description, H1, canonical, viewport, alt text, Open Graph, and thin copy.</p>
+      </article>
+      <article>
+        <h2>3. Fix</h2>
+        <p>The report lists the highest-impact problems first. Optional drafts rewrite the title, description, and H1.</p>
+      </article>
+    </section>
+    <form id="audit">
       <div>
         <label for="url">Website</label>
         <input id="url" type="url" name="url" placeholder="https://example.com" required>
@@ -195,9 +232,10 @@
     </form>
     <p id="status"></p>
     <section id="out"></section>
+    <footer>Runs on your machine. It reports what to change and does not edit the live site. <a href="https://github.com/Chaostheone/seo-bot">Chaostheone/seo-bot</a></footer>
   </main>
   <script>
-    const form = document.getElementById("form");
+    const form = document.getElementById("audit");
     const statusEl = document.getElementById("status");
     const out = document.getElementById("out");
     const go = document.getElementById("go");

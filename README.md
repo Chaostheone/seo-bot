@@ -1,6 +1,8 @@
 # SEO Bot
 
-Local site auditor with a browser UI.
+Public site: https://github.com/Chaostheone/seo-bot
+
+Local auditor with a browser UI. The page at `/` is the website: what the bot checks, then the audit form.
 
 ## Run
 
